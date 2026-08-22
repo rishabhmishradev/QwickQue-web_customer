@@ -216,9 +216,15 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     } catch (e) {
       if (mounted) {
         String errorMsg = 'Booking failed: $e';
-        if (e is dio.DioException && e.response?.statusCode == 401) {
-          errorMsg = 'PLEASE LOG IN TO SECURE APPOINTMENT';
-          context.push('/login');
+        if (e is dio.DioException) {
+          if (e.response?.statusCode == 401) {
+            errorMsg = 'PLEASE LOG IN TO SECURE APPOINTMENT';
+            context.push('/login');
+          } else if (e.response?.statusCode == 403) {
+            errorMsg = 'PERMISSION DENIED. PLEASE CONTACT SUPPORT.';
+          } else if (e.response?.data != null && e.response?.data['error'] != null) {
+            errorMsg = e.response?.data['error'].toString().toUpperCase();
+          }
         }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(errorMsg), backgroundColor: AppColors.rust),
