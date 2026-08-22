@@ -13,6 +13,8 @@ class SalonApiService {
     double? lng, 
     double? radius,
     String? category,
+    String? city,
+    String? state,
   }) async {
     try {
       final response = await _dio.get('salons', queryParameters: {
@@ -20,6 +22,8 @@ class SalonApiService {
         if (lng != null) 'lng': lng,
         if (radius != null) 'radius': radius,
         if (category != null) 'category': category,
+        if (city != null) 'city': city,
+        if (state != null) 'state': state,
       });
       
       final List data = response.data['data'];
@@ -63,14 +67,11 @@ final serviceCategoriesProvider = FutureProvider<List<String>>((ref) async {
 final nearbySalonsProvider = FutureProvider<List<SalonSummary>>((ref) async {
   final locationState = ref.watch(locationProvider);
   
-  // If location isn't set, we show an empty list (UI should handle this with empty state)
-  if (locationState.latitude == null || locationState.longitude == null) {
-    return [];
-  }
-
   return await ref.watch(salonServiceProvider).fetchNearbySalons(
     lat: locationState.latitude,
     lng: locationState.longitude,
+    city: locationState.cityName,
+    state: locationState.stateName,
   );
 });
 
@@ -82,6 +83,8 @@ final salonsByCategoryProvider = FutureProvider.family<List<SalonSummary>, Strin
     lat: locationState.latitude,
     lng: locationState.longitude,
     category: category,
+    city: locationState.cityName,
+    state: locationState.stateName,
   );
 });
 

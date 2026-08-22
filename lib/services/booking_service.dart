@@ -19,7 +19,10 @@ class BookingService {
         'serviceId': serviceId,
         'staffId': staffId,
       });
-      return List<String>.from(response.data['data']);
+      
+      final List data = response.data['data'];
+      // Extract 'time' string from the list of objects returned by backend
+      return data.map((item) => item['time'].toString()).toList();
     } catch (e) {
       rethrow;
     }
