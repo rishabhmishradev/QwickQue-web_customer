@@ -223,7 +223,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           } else if (e.response?.statusCode == 403) {
             errorMsg = 'PERMISSION DENIED. PLEASE CONTACT SUPPORT.';
           } else if (e.response?.data != null && e.response?.data['error'] != null) {
-            errorMsg = e.response?.data['error'].toString().toUpperCase();
+            errorMsg = e.response!.data['error'].toString().toUpperCase();
           }
         }
         ScaffoldMessenger.of(context).showSnackBar(
