@@ -11,13 +11,13 @@ class BookingService {
     required int salonId,
     required String date,
     required int serviceId,
-    required int staffId,
+    int? staffId,
   }) async {
     try {
       final response = await _dio.get('salons/$salonId/availability', queryParameters: {
         'date': date,
         'serviceId': serviceId,
-        'staffId': staffId,
+        if (staffId != null) 'staffId': staffId,
       });
       
       final List data = response.data['data'];
@@ -30,7 +30,7 @@ class BookingService {
 
   Future<BookingModel> holdSlot({
     required int salonId,
-    required int staffId,
+    int? staffId,
     required int serviceId,
     required String date,
     required String startTime,
@@ -38,7 +38,7 @@ class BookingService {
     try {
       final response = await _dio.post('bookings/hold', data: {
         'salonId': salonId,
-        'staffId': staffId,
+        'staffId': staffId, // Can be null
         'serviceId': serviceId,
         'date': date,
         'startTime': startTime,

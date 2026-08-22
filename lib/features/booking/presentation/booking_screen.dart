@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:dio/dio.dart' as dio;
 import '../../../models/salon_model.dart' as models;
 import '../../../services/booking_service.dart';
 import '../../../services/salon_service.dart';
@@ -10,9 +11,15 @@ import '../../../shared/widgets/empty_state.dart';
 
 class BookingScreen extends ConsumerStatefulWidget {
   final int salonId;
+  final int? initialServiceId;
   final models.SalonService? preSelectedService;
 
-  const BookingScreen({super.key, required this.salonId, this.preSelectedService});
+  const BookingScreen({
+    super.key, 
+    required this.salonId, 
+    this.preSelectedService,
+    this.initialServiceId,
+  });
 
   @override
   ConsumerState<BookingScreen> createState() => _BookingScreenState();
@@ -29,13 +36,11 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.preSelectedService != null) {
-      _selectedServiceId = widget.preSelectedService!.id;
-    }
+    _selectedServiceId = widget.initialServiceId ?? widget.preSelectedService?.id;
   }
 
   Future<void> _fetchSlots() async {
-    if (_selectedStaffId == null || _selectedServiceId == null) return;
+    if (_selectedServiceId == null) return;
 
     setState(() => _isLoadingSlots = true);
     try {
@@ -44,7 +49,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         salonId: widget.salonId,
         date: dateStr,
         serviceId: _selectedServiceId!,
-        staffId: _selectedStaffId!,
+        staffId: _selectedStaffId, // Now correctly passing optional staffId
       );
       setState(() => _availableSlots = slots);
     } catch (e) {
@@ -199,7 +204,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       
       await ref.read(bookingServiceProvider).holdSlot(
         salonId: widget.salonId,
-        staffId: _selectedStaffId!,
+        staffId: _selectedStaffId,
         serviceId: _selectedServiceId!,
         date: dateStr,
         startTime: _selectedSlot!,
@@ -210,8 +215,13 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       }
     } catch (e) {
       if (mounted) {
+        String errorMsg = 'Booking failed: $e';
+        if (e is dio.DioException && e.response?.statusCode == 401) {
+          errorMsg = 'PLEASE LOG IN TO SECURE APPOINTMENT';
+          context.push('/login');
+        }
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Booking failed: $e'), backgroundColor: AppColors.rust),
+          SnackBar(content: Text(errorMsg), backgroundColor: AppColors.rust),
         );
       }
     }

@@ -70,7 +70,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/book/:salonId',
-        builder: (context, state) => BookingScreen(salonId: int.parse(state.pathParameters['salonId']!)),
+        builder: (context, state) {
+          final salonId = int.parse(state.pathParameters['salonId']!);
+          final serviceId = state.uri.queryParameters['serviceId'];
+          return BookingScreen(
+            salonId: salonId,
+            initialServiceId: serviceId != null ? int.parse(serviceId) : null,
+          );
+        },
       ),
       GoRoute(
         path: '/booking-summary',
