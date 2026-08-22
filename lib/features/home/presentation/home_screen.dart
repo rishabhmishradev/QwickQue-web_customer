@@ -36,54 +36,46 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.chalk,
-      endDrawer: const _HomeDrawer(),
       appBar: AppBar(
-        leadingWidth: 120,
-        leading: Center(
-          child: Padding(
-            padding: const EdgeInsets.only(left: 24.0),
-            child: Text(
-              'QUICKQUE',
-              style: theme.textTheme.displayLarge?.copyWith(
-                fontSize: 14,
-                letterSpacing: 2,
-                color: AppColors.ink,
-              ),
-            ),
+        toolbarHeight: 60,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leadingWidth: 200,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16.0),
+          child: Image.asset(
+            'assets/logo.png', 
+            height: 120, // Increased to match the "text" visual size requested
+            width: 120, 
+            fit: BoxFit.contain,
+            alignment: Alignment.centerLeft,
           ),
         ),
-        title: GestureDetector(
-          onTap: () => _showLocationPicker(context),
-          child: Column(
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: GestureDetector(
+              onTap: () => _showLocationPicker(context),
+              child: Row(
                 children: [
-                  const Icon(Icons.location_on, size: 14, color: AppColors.brass),
+                  const Icon(Icons.location_on, size: 14, color: Color(0xFFB8935A)),
                   const SizedBox(width: 4),
                   Text(
                     (locationState.cityName ?? 'SET LOCATION').toUpperCase(),
-                    style: theme.textTheme.labelSmall?.copyWith(fontSize: 10, fontWeight: FontWeight.bold),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
-                  const Icon(Icons.keyboard_arrow_down, size: 14, color: AppColors.ink),
+                  const Icon(Icons.keyboard_arrow_down, size: 14, color: Colors.black),
                 ],
               ),
-              if (locationState.status == LocationStatus.loading)
-                const LinearProgressIndicator(minHeight: 1, backgroundColor: Colors.transparent, color: AppColors.brass),
-            ],
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.menu, color: AppColors.ink),
-              onPressed: () => Scaffold.of(context).openEndDrawer(),
             ),
           ),
-          const SizedBox(width: 12),
         ],
       ),
+      bottomNavigationBar: const BoutiqueBottomNav(),
       body: RefreshIndicator(
         color: AppColors.rouge,
         onRefresh: () async {
@@ -293,6 +285,67 @@ class _DrawerTile extends StatelessWidget {
   }
 }
 
+class BoutiqueBottomNav extends StatelessWidget {
+  const BoutiqueBottomNav({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 60,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Color(0xFFDED9D1), width: 1)),
+      ),
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.home_outlined, size: 22),
+                onPressed: () => context.go('/home'),
+              ),
+              IconButton(
+                icon: const Icon(Icons.explore_outlined, size: 22),
+                onPressed: () => context.go('/explore'),
+              ),
+              const SizedBox(width: 40), // Space for center button
+              IconButton(
+                icon: const Icon(Icons.percent_outlined, size: 22),
+                onPressed: () => context.push('/offers'),
+              ),
+              IconButton(
+                icon: const Icon(Icons.person_outline, size: 22),
+                onPressed: () => context.push('/profile'),
+              ),
+            ],
+          ),
+          Positioned(
+            top: -15,
+            child: GestureDetector(
+              onTap: () => context.push('/my-bookings'),
+              child: Container(
+                height: 50,
+                width: 50,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF7A0000),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
+                  ],
+                ),
+                child: const Icon(Icons.hourglass_bottom, color: Colors.black, size: 26),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _SectionTitle extends StatelessWidget {
   final String title;
   const _SectionTitle({required this.title});
@@ -302,9 +355,16 @@ class _SectionTitle extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: Theme.of(context).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold, color: AppColors.brass)),
+        Text(
+          title, 
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            fontWeight: FontWeight.bold, 
+            color: const Color(0xFF7A0000), // Dark red like screenshot
+            fontSize: 12,
+          ),
+        ),
         const SizedBox(height: 4),
-        Container(width: 32, height: 1.5, color: AppColors.brass),
+        Container(width: 40, height: 2, color: Colors.black),
       ],
     );
   }
@@ -500,23 +560,30 @@ class _CategoryItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 85,
+        width: 70,
         margin: const EdgeInsets.only(right: 16),
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: const Color(0xFFDED9D1)),
-                borderRadius: BorderRadius.circular(4),
+              height: 70,
+              width: 70,
+              decoration: const BoxDecoration(
+                color: Color(0xFF7A0000), // Dark red circle
+                shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: AppColors.ink, size: 24),
+              child: Center(
+                child: Icon(icon, color: Colors.white, size: 32),
+              ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Text(
-              label, 
-              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1), 
+              label.toUpperCase(),
+              style: const TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+                letterSpacing: 0.5,
+              ),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -534,78 +601,112 @@ class _SalonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return GestureDetector(
       onTap: () => context.push('/salons/${salon.id}'),
       child: Container(
         margin: const EdgeInsets.only(bottom: 24),
         decoration: BoxDecoration(
           color: Colors.white,
-          border: Border.all(color: const Color(0xFFDED9D1)),
-          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: const Color(0xFF7A0000), width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AspectRatio(
               aspectRatio: 16 / 9,
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: salon.mainImage != null
-                        ? Image.network(salon.mainImage!, fit: BoxFit.cover)
-                        : Container(color: Colors.grey[200], child: const Icon(Icons.image, color: Colors.white, size: 40)),
-                  ),
-                  if (salon.isOpen)
-                    Positioned(
-                      top: 12,
-                      right: 12,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(color: AppColors.sage, borderRadius: BorderRadius.circular(2)),
-                        child: const Text('OPEN', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                      ),
+              child: salon.mainImage != null
+                  ? Image.network(salon.mainImage!, fit: BoxFit.cover)
+                  : Container(
+                      color: Colors.grey[100],
+                      child: const Icon(Icons.image, color: Colors.white, size: 48),
                     ),
-                ],
-              ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              color: Colors.white,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: Text(salon.name.toUpperCase(), style: theme.textTheme.headlineMedium?.copyWith(fontSize: 18, letterSpacing: 1)),
+                        child: Text(
+                          salon.name.toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.black,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
                       ),
-                      Row(
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          const Icon(Icons.star, color: AppColors.brass, size: 16),
-                          const SizedBox(width: 4),
-                          Text(salon.rating.toString(), style: theme.textTheme.labelSmall?.copyWith(fontSize: 14)),
+                          const Text(
+                            'RATINGS',
+                            style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.black54),
+                          ),
+                          Row(
+                            children: [
+                              const Icon(Icons.star, size: 14, color: Color(0xFFB8935A)),
+                              const SizedBox(width: 2),
+                              Text(
+                                salon.rating.toString(),
+                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
-                  Text(salon.address?.toUpperCase() ?? '', style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey[600], fontSize: 9)),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 8),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      const Icon(Icons.near_me_outlined, size: 12, color: Colors.grey),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${salon.distance.toStringAsFixed(1)} KM AWAY',
-                        style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold, color: Colors.grey),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            salon.address?.toUpperCase() ?? 'CITY',
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black54),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${salon.distance.toStringAsFixed(1)} KM',
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Colors.black),
+                          ),
+                        ],
                       ),
-                      const Spacer(),
-                      if (salon.startingPrice != null)
-                        Text(
-                          'FROM ₹${salon.startingPrice!.toInt()}',
-                          style: theme.textTheme.labelSmall?.copyWith(color: AppColors.rouge, fontWeight: FontWeight.bold, fontSize: 14),
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          const Text(
+                            'PRICE',
+                            style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.black54),
+                          ),
+                          Text(
+                            '₹${salon.startingPrice?.toInt() ?? 0}',
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w900,
+                              color: Color(0xFF7A0000),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ],

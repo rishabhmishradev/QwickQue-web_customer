@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
+import '../../features/home/presentation/explore_screen.dart';
 import '../../features/home/presentation/splash_screen.dart';
 import '../../features/home/presentation/onboarding_screen.dart';
 import '../../features/salons/presentation/salon_detail_screen.dart';
@@ -56,6 +57,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(path: '/register', builder: (context, state) => const RegisterScreen()),
       GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
+      GoRoute(path: '/explore', builder: (context, state) => const ExploreScreen()),
       GoRoute(
         path: '/category/:name',
         builder: (context, state) => CategoryDetailScreen(category: state.pathParameters['name']!),

@@ -30,7 +30,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.chalk,
-      appBar: AppBar(backgroundColor: Colors.transparent),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32.0),
@@ -39,34 +38,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    'QUICKQUE',
-                    style: theme.textTheme.displayLarge?.copyWith(
-                      letterSpacing: 8,
-                      fontSize: 40,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'BOUTIQUE APPOINTMENTS',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: AppColors.brass,
-                      fontWeight: FontWeight.bold,
+                  Center(
+                    child: Image.asset(
+                      'assets/logo.png',
+                      height: 150,
+                      fit: BoxFit.contain,
                     ),
                   ),
                   const SizedBox(height: 64),
                   
                   _BoutiqueTextField(
                     controller: _emailController,
-                    label: 'EMAIL ADDRESS',
-                    hint: 'name@example.com',
+                    label: 'ENTER YOUR EMAIL',
+                    hint: 'ENTER YOUR EMAIL',
                     keyboardType: TextInputType.emailAddress,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   _BoutiqueTextField(
                     controller: _passwordController,
                     label: 'PASSWORD',
-                    hint: '••••••••',
+                    hint: 'PASSWORD',
                     obscureText: true,
                   ),
                   const SizedBox(height: 32),
@@ -86,23 +77,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     isLoading: _isLoading,
                     onPressed: _handleLogin,
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
                   TextButton(
                     onPressed: () => context.push('/register'),
                     child: Text(
-                      'NEW TO QUICKQUE? CREATE AN ACCOUNT',
+                      'NEW TO QWICKQUE? CREATE AN ACCOUNT',
                       style: theme.textTheme.labelSmall?.copyWith(
                         decoration: TextDecoration.underline,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 11,
                       ),
                     ),
                   ),
-                  
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 24),
                   TextButton(
                     onPressed: () => ref.read(authProvider.notifier).loginAsDemo(),
                     child: Text(
-                      'BYPASS FOR REVIEW (DEMO MODE)',
-                      style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey),
+                      'DEMO MODE (DEBUG)',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: Colors.black.withOpacity(0.3),
+                        fontSize: 9,
+                      ),
                     ),
                   ),
                 ],
@@ -155,19 +150,40 @@ class _BoutiqueTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
         TextField(
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
-          style: theme.textTheme.bodyMedium,
+          style: theme.textTheme.bodyMedium?.copyWith(fontSize: 12),
           decoration: InputDecoration(
             hintText: hint,
+            hintStyle: theme.textTheme.labelSmall?.copyWith(
+              color: Colors.black.withOpacity(0.4),
+              fontSize: 10,
+            ),
+            fillColor: Colors.white,
+            filled: true,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.zero,
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.zero,
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.zero,
+              borderSide: BorderSide.none,
+            ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: theme.textTheme.labelSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize: 10,
           ),
         ),
       ],
@@ -189,9 +205,22 @@ class _BoutiqueButton extends StatelessWidget {
       height: 56,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF7A0000), // Darker red
+          foregroundColor: Colors.black, // Dark text on red button
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          elevation: 0,
+        ),
         child: isLoading 
           ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
-          : Text(label),
+          : Text(
+              label,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+                letterSpacing: 1.2,
+              ),
+            ),
       ),
     );
   }

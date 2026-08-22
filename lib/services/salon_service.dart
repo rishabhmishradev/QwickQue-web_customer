@@ -75,6 +75,11 @@ final nearbySalonsProvider = FutureProvider<List<SalonSummary>>((ref) async {
   );
 });
 
+// All Salons Provider (No location filter for Explore)
+final allSalonsProvider = FutureProvider<List<SalonSummary>>((ref) async {
+  return await ref.watch(salonServiceProvider).fetchNearbySalons();
+});
+
 // Salons by Category Provider
 final salonsByCategoryProvider = FutureProvider.family<List<SalonSummary>, String>((ref, category) async {
   final locationState = ref.watch(locationProvider);

@@ -7,6 +7,7 @@ class SalonSummary {
   final double? startingPrice;
   final double distance;
   final bool isOpen;
+  final List<String> categories;
 
   SalonSummary({
     required this.id,
@@ -17,6 +18,7 @@ class SalonSummary {
     this.startingPrice,
     required this.distance,
     required this.isOpen,
+    this.categories = const [],
   });
 
   factory SalonSummary.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class SalonSummary {
       startingPrice: json['starting_price'] != null ? double.tryParse(json['starting_price'].toString()) : null,
       distance: double.tryParse(json['distance']?.toString() ?? '0') ?? 0.0,
       isOpen: json['is_open'] ?? false,
+      categories: List<String>.from(json['categories'] ?? []),
     );
   }
 }
