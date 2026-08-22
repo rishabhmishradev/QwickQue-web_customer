@@ -491,28 +491,39 @@ class _CategoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    IconData icon = Icons.spa;
-    if (label.contains('HAIR')) icon = Icons.content_cut;
-    if (label.contains('FACE') || label.contains('FACIAL')) icon = Icons.face_retouching_natural;
-    if (label.contains('NAIL')) icon = Icons.clean_hands;
-    if (label.contains('MAKEUP')) icon = Icons.brush;
+    IconData icon = Icons.spa; // Default
+    final l = label.toUpperCase();
+    
+    if (l.contains('HAIR')) {
+      icon = Icons.content_cut;
+    } else if (l.contains('FACE') || l.contains('FACIAL')) {
+      icon = Icons.face_retouching_natural;
+    } else if (l.contains('NAIL') || l.contains('MANICURE') || l.contains('PEDICURE')) {
+      icon = Icons.clean_hands;
+    } else if (l.contains('MAKEUP')) {
+      icon = Icons.brush;
+    } else if (l.contains('MASSAGE')) {
+      icon = Icons.spa;
+    } else if (l.contains('SPA')) {
+      icon = Icons.hot_tub;
+    }
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 70,
-        margin: const EdgeInsets.only(right: 16),
+        width: 80,
+        margin: const EdgeInsets.only(right: 12),
         child: Column(
           children: [
             Container(
-              height: 70,
-              width: 70,
+              height: 64,
+              width: 64,
               decoration: const BoxDecoration(
                 color: Color(0xFF7A0000), // Dark red circle
                 shape: BoxShape.circle,
               ),
               child: Center(
-                child: Icon(icon, color: Colors.white, size: 32),
+                child: Icon(icon, color: Colors.white, size: 28),
               ),
             ),
             const SizedBox(height: 8),
@@ -525,7 +536,7 @@ class _CategoryItem extends StatelessWidget {
                 letterSpacing: 0.5,
               ),
               textAlign: TextAlign.center,
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
           ],
