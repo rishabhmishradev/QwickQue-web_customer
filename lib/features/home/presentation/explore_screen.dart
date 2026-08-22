@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../services/salon_service.dart';
 import '../../../services/location_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../shared/widgets/boutique_bottom_nav.dart';
 import 'home_screen.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
