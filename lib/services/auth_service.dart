@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -28,6 +29,37 @@ class AuthNotifier extends StateNotifier<AuthState> {
     checkInitialState();
   }
 
+  Future<void> _saveUserToCache(UserModel user) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('cached_user', jsonEncode(user.toJson()));
+    } catch (e) {
+      print('DEBUG_AUTH: Failed to cache user: $e');
+    }
+  }
+
+  Future<void> _clearUserCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('cached_user');
+    } catch (e) {
+      print('DEBUG_AUTH: Failed to clear user cache: $e');
+    }
+  }
+
+  Future<UserModel?> _loadUserFromCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userJson = prefs.getString('cached_user');
+      if (userJson != null) {
+        return UserModel.fromJson(jsonDecode(userJson));
+      }
+    } catch (e) {
+      print('DEBUG_AUTH: Failed to load cached user: $e');
+    }
+    return null;
+  }
+
   Future<void> checkInitialState() async {
     print('DEBUG_AUTH: 1. Checking Onboarding...');
     try {
@@ -40,11 +72,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
         return;
       }
 
-      print('DEBUG_AUTH: 3. Reading Token...');
+      print('DEBUG_AUTH: 3. Reading Token & Cache...');
       final token = await _storage.read(key: 'jwt_token').timeout(
         const Duration(seconds: 2),
         onTimeout: () => null,
       );
+
+      final cachedUser = await _loadUserFromCache();
 
       if (token == null) {
         print('DEBUG_AUTH: 4. No Token Found');
@@ -52,21 +86,50 @@ class AuthNotifier extends StateNotifier<AuthState> {
         return;
       }
 
+      // If we have a token and a cached user, authenticate immediately for UI speed
+      if (cachedUser != null) {
+        print('DEBUG_AUTH: 4.5 Authenticating from Cache');
+        state = AuthState.authenticated(cachedUser);
+      }
+
       print('DEBUG_AUTH: 5. Verifying with Cloud...');
       final client = _ref.read(apiClientProvider);
-      final response = await client.get('auth/me').timeout(const Duration(seconds: 4));
       
-      if (response.statusCode == 200) {
-        print('DEBUG_AUTH: 6. Session Validated');
-        final userModel = UserModel.fromJson(response.data['data']);
-        state = AuthState.authenticated(userModel);
-      } else {
-        print('DEBUG_AUTH: 7. Session Invalid (401)');
-        await logout();
+      try {
+        final response = await client.get('auth/me').timeout(const Duration(seconds: 4));
+        
+        if (response.statusCode == 200) {
+          print('DEBUG_AUTH: 6. Session Validated');
+          final userModel = UserModel.fromJson(response.data['data']);
+          await _saveUserToCache(userModel);
+          state = AuthState.authenticated(userModel);
+        } else {
+          print('DEBUG_AUTH: 7. Session Invalid (Not 200)');
+          if (response.statusCode == 401 || response.statusCode == 403) {
+            await logout();
+          } else if (state.status == AuthStatus.unknown) {
+             state = AuthState.unauthenticated(error: 'SERVER_UNAVAILABLE');
+          }
+        }
+      } catch (e) {
+        print('DEBUG_AUTH: Cloud verification failed, relying on cache/local state: $e');
+        if (e is dio.DioException) {
+          if (e.response?.statusCode == 401 || e.response?.statusCode == 403) {
+            await logout();
+            return;
+          }
+        }
+        
+        // If we were already authenticated from cache, stay authenticated
+        if (state.status == AuthStatus.unknown) {
+          state = AuthState.unauthenticated(error: 'OFFLINE_MODE');
+        }
       }
     } catch (e) {
-      print('DEBUG_AUTH: ERROR caught: $e');
-      state = AuthState.unauthenticated(error: 'Connection unstable. Log in again.');
+      print('DEBUG_AUTH: Critical error in checkInitialState: $e');
+      if (state.status == AuthStatus.unknown) {
+        state = AuthState.unauthenticated(error: 'INITIALIZATION_ERROR');
+      }
     }
   }
 
@@ -88,8 +151,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
       if (response.data['success']) {
         final token = response.data['data']['token'];
         final userData = response.data['data']['user'];
+        final userModel = UserModel.fromJson(userData);
+        
         await _storage.write(key: 'jwt_token', value: token);
-        state = AuthState.authenticated(UserModel.fromJson(userData));
+        await _saveUserToCache(userModel);
+        
+        state = AuthState.authenticated(userModel);
       }
     } on dio.DioException catch (e) {
       String message = 'LOGIN_FAILED';
@@ -118,8 +185,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
       if (response.data['success']) {
         final token = response.data['data']['token'];
         final userData = response.data['data']['user'];
+        final userModel = UserModel.fromJson(userData);
+
         await _storage.write(key: 'jwt_token', value: token);
-        state = AuthState.authenticated(UserModel.fromJson(userData));
+        await _saveUserToCache(userModel);
+
+        state = AuthState.authenticated(userModel);
       }
     } on dio.DioException catch (e) {
       String message = 'REGISTRATION_FAILED';
@@ -145,11 +216,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   void updateLocalUser(UserModel user) {
+    _saveUserToCache(user);
     state = AuthState.authenticated(user);
   }
 
   Future<void> logout() async {
     await _storage.delete(key: 'jwt_token');
+    await _clearUserCache();
     state = AuthState.unauthenticated();
   }
 
