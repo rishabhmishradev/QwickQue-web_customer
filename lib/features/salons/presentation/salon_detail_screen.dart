@@ -202,7 +202,7 @@ class _SectionHeader extends StatelessWidget {
 }
 
 class _ServiceItem extends StatelessWidget {
-  final Service service;
+  final SalonService service;
   final bool isSelected;
   final VoidCallback onTap;
 
