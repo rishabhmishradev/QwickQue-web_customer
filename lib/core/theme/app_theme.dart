@@ -89,8 +89,8 @@ class AppTheme {
           borderRadius: BorderRadius.circular(4),
           borderSide: const BorderSide(color: AppColors.ink, width: 1.5),
         ),
-        labelStyle: GoogleFonts.inter(color: AppColors.ink.withOpacity(0.6)),
-        hintStyle: GoogleFonts.inter(color: AppColors.ink.withOpacity(0.4)),
+        labelStyle: GoogleFonts.inter(color: AppColors.rouge.withOpacity(0.8)),
+        hintStyle: GoogleFonts.inter(color: AppColors.rouge.withOpacity(0.4)),
       ),
       cardTheme: CardThemeData(
         color: AppColors.paper,
