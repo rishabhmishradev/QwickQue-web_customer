@@ -78,8 +78,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       }
     } catch (e) {
       if (mounted) {
+        String errorMsg = e.toString();
+        if (e is dio.DioException) {
+          errorMsg = e.response?.data['error'] ?? e.message;
+        }
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: AppColors.rust),
+          SnackBar(content: Text(errorMsg.toString().toUpperCase()), backgroundColor: AppColors.rust),
         );
       }
     } finally {

@@ -45,6 +45,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 24),
           // Search Bar
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
