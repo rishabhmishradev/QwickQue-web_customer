@@ -291,56 +291,60 @@ class BoutiqueBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 60,
       decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(top: BorderSide(color: Color(0xFFDED9D1), width: 1)),
       ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        alignment: Alignment.center,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+      child: SafeArea(
+        child: SizedBox(
+          height: 60,
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
             children: [
-              IconButton(
-                icon: const Icon(Icons.home_outlined, size: 22),
-                onPressed: () => context.go('/home'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.home_outlined, size: 22),
+                    onPressed: () => context.go('/home'),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.explore_outlined, size: 22),
+                    onPressed: () => context.go('/explore'),
+                  ),
+                  const SizedBox(width: 40), // Space for center button
+                  IconButton(
+                    icon: const Icon(Icons.percent_outlined, size: 22),
+                    onPressed: () => context.push('/offers'),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.person_outline, size: 22),
+                    onPressed: () => context.push('/profile'),
+                  ),
+                ],
               ),
-              IconButton(
-                icon: const Icon(Icons.explore_outlined, size: 22),
-                onPressed: () => context.go('/explore'),
-              ),
-              const SizedBox(width: 40), // Space for center button
-              IconButton(
-                icon: const Icon(Icons.percent_outlined, size: 22),
-                onPressed: () => context.push('/offers'),
-              ),
-              IconButton(
-                icon: const Icon(Icons.person_outline, size: 22),
-                onPressed: () => context.push('/profile'),
+              Positioned(
+                top: -15,
+                child: GestureDetector(
+                  onTap: () => context.push('/my-bookings'),
+                  child: Container(
+                    height: 50,
+                    width: 50,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF7A0000),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
+                      ],
+                    ),
+                    child: const Icon(Icons.hourglass_bottom, color: Colors.black, size: 26),
+                  ),
+                ),
               ),
             ],
           ),
-          Positioned(
-            top: -15,
-            child: GestureDetector(
-              onTap: () => context.push('/my-bookings'),
-              child: Container(
-                height: 50,
-                width: 50,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF7A0000),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
-                  ],
-                ),
-                child: const Icon(Icons.hourglass_bottom, color: Colors.black, size: 26),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

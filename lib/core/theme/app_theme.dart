@@ -37,8 +37,8 @@ class AppTheme {
             fontWeight: FontWeight.w600, color: AppColors.ink, fontSize: 24),
         headlineMedium: GoogleFonts.fraunces(
             fontWeight: FontWeight.w600, color: AppColors.ink, fontSize: 20),
-        bodyLarge: GoogleFonts.inter(color: AppColors.ink, fontSize: 16),
-        bodyMedium: GoogleFonts.inter(color: AppColors.ink, fontSize: 14),
+        bodyLarge: GoogleFonts.inter(color: AppColors.rouge, fontSize: 16),
+        bodyMedium: GoogleFonts.inter(color: AppColors.rouge, fontSize: 14),
         labelSmall: GoogleFonts.ibmPlexMono(
             color: AppColors.ink, fontSize: 10, letterSpacing: 1.5),
         labelMedium: GoogleFonts.ibmPlexMono(
